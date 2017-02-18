@@ -13,6 +13,7 @@ import Signout from './components/auth/signout';
 import Signup from './components/auth/signup';
 import RequireAuth from './components/auth/require-auth';
 import ResetPassword from './components/auth/reset-password';
+import SetNewPassword from './components/auth/set-new-password';
 import Feature from './components/feature';
 import Welcome from './components/welcome';
 import reducers from './reducers';
@@ -37,6 +38,7 @@ ReactDOM.render(
         <Route path="signup" component={Signup} />
         <Route path="feature" component={RequireAuth(Feature)} />
         <Route path="reset-password" component={ResetPassword} />
+        <Route path="reset-password/:resetToken" component={SetNewPassword} />
       </Route>
     </Router>
   </Provider>

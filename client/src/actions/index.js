@@ -7,6 +7,8 @@ import {
   FETCH_MESSAGE,
   RESET_PASSWORD_SUCCESS,
   RESET_PASSWORD_ERROR,
+  SET_NEW_PASSWORD_ERROR,
+  SET_NEW_PASSWORD_SUCCESS,
 } from './types';
 
 const ROOT_URL = 'http://localhost:3090';
@@ -87,11 +89,29 @@ export function sendResetPasswordLink({ email }) {
         dispatch({
           type: RESET_PASSWORD_SUCCESS,
           payload: response.data.message,
-        })
+        });
       })
       .catch(({ response }) => {
         return dispatch({
           type: RESET_PASSWORD_ERROR,
+          payload: response.data.error,
+        });
+      });
+  }
+}
+
+export function saveNewPassword({ password, resetToken }) {
+  return function(dispatch) {
+    axios.post(`${ROOT_URL}/reset-password`, { password, resetToken })
+      .then((response) => {
+        dispatch({
+          type: SET_NEW_PASSWORD_SUCCESS,
+          payload: response.data.message,
+        });
+      })
+      .catch(({ response }) => {
+        return dispatch({
+          type: SET_NEW_PASSWORD_ERROR,
           payload: response.data.error,
         });
       });

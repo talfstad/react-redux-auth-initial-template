@@ -4,6 +4,7 @@ const uuidV4 = require('uuid/v4');
 const User = require('../models/user');
 const config = require('../config');
 const emailValidator = require('email-validator');
+const sendResetPasswordEmail = require('../services/email/reset-password');
 
 function tokenForUser(user) {
   const timestamp = new Date().getTime();
@@ -58,9 +59,6 @@ exports.sendResetPasswordToken = function(req, res, next) {
     res.status(422).send({ error: 'You must provide a valid email' });
   }
 
-  // Create a new reset token and update user
-  // TODO SEND EMAIL WITH TOKEN LINK (base64 token + email) using mailchimp API
-  // TODO do the token correctly
   User.findOneAndUpdate({
     email
   }, {
@@ -69,13 +67,24 @@ exports.sendResetPasswordToken = function(req, res, next) {
   })
     .then((updateResponse) => {
       if (updateResponse) {
-        res.send({ message: 'Successfully sent a reset link to your email address' });
+        sendResetPasswordEmail({ resetToken, email })
+          .then((response) => {
+            res.send({ message: 'Successfully sent a reset link to your email address' });
+          })
+          .catch((err) => {
+            // 503 Service Unavailable - Email could not be sent
+            res.status(503).send({ error: 'Could not send reset link' });
+          });
       } else {
-        // Did not find user email
+        // 404 Not Found - Did not find user email
         res.status(404).send({ error: 'Email not found' });
       }
     })
-    .catch(err => res.send(err));
+    .catch((err) => {
+      console.log("IN CATCH!!");
+      console.log(err);
+      res.status(500).send({ error: 'Could not send reset link' });
+    });
 };
 
 // resets the user's password, we're auth'd to reset password
@@ -94,7 +103,7 @@ exports.resetPassword = function(req, res, next) {
       resetToken: '',
       resetTokenCreatedOn: null,
     })
-    .then(({ _id, lastModified }) => res.send({ _id, lastModified }))
-    .catch(err => res.status(400).send(err));
+    .then(({ _id, lastModified }) => res.send({ message: 'Successfully updated password' }))
+    .catch(err => res.status(400).send({ error: 'This link is expired, request a new reset password link'}));
   });
 };

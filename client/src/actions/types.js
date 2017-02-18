@@ -5,3 +5,5 @@ export const FETCH_MESSAGE = 'fetch-message';
 export const SEND_RESET_PASSWORD_LINK = 'send-reset-password-link';
 export const RESET_PASSWORD_SUCCESS = 'reset-password-success';
 export const RESET_PASSWORD_ERROR = 'reset-password-error';
+export const SET_NEW_PASSWORD_SUCCESS = 'set-new-password-success';
+export const SET_NEW_PASSWORD_ERROR = 'set-new-password-error';
